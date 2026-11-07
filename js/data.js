@@ -5,7 +5,8 @@ export const BODIES = [
         description: 'Étoile au centre du système solaire, elle concentre 99,86 % de sa masse. Sa lumière met environ 8 minutes à atteindre la Terre.',
         massKg: 1.989e30, diameterKm: 1392700, gravity: 274, rotationHours: 609.12, tiltDeg: 7.25, meanTempC: 5500,
         galactic: { periodYears: 230e6, speedKms: 220, distanceLy: 26000 },
-        texture: { kind: 'sun', seed: 1, colors: ['#8a2400', '#e8590c', '#ffb547', '#fff3c4'] }
+        texture: { kind: 'sun', seed: 1, colors: ['#8a2400', '#e8590c', '#ffb547', '#fff3c4'] },
+        glow: [[0, 'rgba(255, 236, 190, 1)'], [0.18, 'rgba(255, 196, 110, .75)'], [0.4, 'rgba(255, 140, 50, .18)'], [1, 'rgba(255, 120, 30, 0)']]
     },
     {
         id: 'mercure', name: 'Mercure', type: 'Planète tellurique', color: '#b5aca3',

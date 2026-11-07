@@ -4,15 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- L'empreinte sha256 autorise uniquement l'import map ci-dessous : la recalculer si elle change -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Ee4lpyh9YliuA2rt9f9lnL3mmWNXI863YQ/36IrLsOo='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Ee4lpyh9YliuA2rt9f9lnL3mmWNXI863YQ/36IrLsOo='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Système solaire interactif</title>
     <meta name="description" content="Explorez le système solaire en 3D : tournez autour du Soleil et observez chaque planète, sa rotation, sa révolution, sa gravité et sa masse.">
+    <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48 64x64">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
     <link rel="stylesheet" href="css/main.css">
     <script type="importmap">{"imports": {"three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/"}}</script>
+    <script type="module" src="js/favicon.js"></script>
     <script type="module" src="js/main.js"></script>
 </head>
 <body>

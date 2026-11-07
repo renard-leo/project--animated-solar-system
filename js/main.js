@@ -102,16 +102,13 @@ const shift = { x: 0, y: 0, goalX: 0, goalY: 0 };
 const tmp = { pointer: new THREE.Vector2(), goal: new THREE.Vector3(), direction: new THREE.Vector3(), side: new THREE.Vector3(), delta: new THREE.Vector3(), lastTarget: new THREE.Vector3(), projected: new THREE.Vector3() };
 let renderer, controls, belt;
 
-function createGlowTexture() {
+function createGlowTexture(stops) {
     const size = 256;
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = size;
     const context = canvas.getContext('2d');
     const glow = context.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-    glow.addColorStop(0, 'rgba(255, 236, 190, 1)');
-    glow.addColorStop(0.18, 'rgba(255, 196, 110, .75)');
-    glow.addColorStop(0.4, 'rgba(255, 140, 50, .18)');
-    glow.addColorStop(1, 'rgba(255, 120, 30, 0)');
+    for (const [offset, color] of stops) glow.addColorStop(offset, color);
     context.fillStyle = glow;
     context.fillRect(0, 0, size, size);
     const texture = new THREE.CanvasTexture(canvas);
@@ -254,7 +251,7 @@ function createBody(data) {
         body.pickables.push(ring);
     }
     if (isSun) {
-        const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: createGlowTexture(), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false }));
+        const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: createGlowTexture(data.glow), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false }));
         glow.scale.setScalar(radius * 6);
         group.add(glow);
     } else {
