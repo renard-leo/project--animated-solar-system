@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- L'empreinte sha256 autorise uniquement l'import map ci-dessous : la recalculer si elle change -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Ee4lpyh9YliuA2rt9f9lnL3mmWNXI863YQ/36IrLsOo='; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Système solaire interactif</title>
+    <meta name="description" content="Explorez le système solaire en 3D : tournez autour du Soleil et observez chaque planète, sa rotation, sa révolution, sa gravité et sa masse.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+    <link rel="stylesheet" href="css/main.css">
+    <script type="importmap">{"imports": {"three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/"}}</script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <canvas id="scene" class="scene" aria-label="Vue 3D du système solaire. Utilisez la liste des astres pour en sélectionner un."></canvas>
+    <div id="labels" class="labels" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <h1 class="site-title">Système solaire</h1>
+        <p class="site-date"><span class="eyebrow">Date simulée</span> <span id="sim-date" aria-live="off">…</span></p>
+        <p class="site-hint text-muted fs-sm">Glissez pour tourner autour du Soleil, utilisez la molette ou pincez pour zoomer, cliquez sur un astre pour l’observer.</p>
+        <p class="site-scale fs-xs">Tailles et distances non respectées pour rester lisibles.</p>
+    </header>
+
+    <div class="toolbar" role="toolbar" aria-label="Contrôles de la simulation">
+        <button id="btn-play" class="btn-icon play-toggle" type="button" aria-label="Mettre la simulation en pause" aria-keyshortcuts="Space">
+            <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+            <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/></svg>
+        </button>
+        <label class="speed">
+            <span class="eyebrow">Vitesse</span>
+            <input id="speed" class="range" type="range" min="0" step="1">
+            <output id="speed-value" class="speed-value" for="speed"></output>
+        </label>
+        <button id="btn-orbits" class="btn" type="button" aria-pressed="true">Orbites</button>
+        <button id="btn-labels" class="btn" type="button" aria-pressed="true">Noms</button>
+        <button id="btn-today" class="btn" type="button">Aujourd’hui</button>
+        <button id="btn-reset" class="btn-icon" type="button" aria-label="Revenir à la vue d’ensemble" title="Vue d’ensemble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.5"/></svg>
+        </button>
+    </div>
+
+    <nav class="planet-nav" aria-label="Astres">
+        <ul id="planet-list" class="planet-list"></ul>
+    </nav>
+
+    <aside id="info-panel" class="info-panel" aria-labelledby="info-name" inert>
+        <div class="info-header">
+            <div class="info-heading">
+                <p class="info-type"><span id="info-dot" class="planet-dot"></span><span id="info-type" class="eyebrow"></span></p>
+                <h2 id="info-name" class="info-name" aria-live="polite"></h2>
+            </div>
+            <div class="info-actions">
+                <button id="btn-prev" class="btn-icon" type="button" aria-label="Astre précédent" aria-keyshortcuts="ArrowLeft">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+                </button>
+                <button id="btn-next" class="btn-icon" type="button" aria-label="Astre suivant" aria-keyshortcuts="ArrowRight">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+                </button>
+                <button id="btn-close" class="btn-icon" type="button" aria-label="Fermer et revenir à la vue d’ensemble" aria-keyshortcuts="Escape">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="info-body" class="info-body"></div>
+    </aside>
+
+    <div id="loader" class="loader" role="status">
+        <span class="loader-spinner" aria-hidden="true"></span>
+        <p id="loader-text">Génération des planètes…</p>
+    </div>
+    <noscript><p class="loader">Cette animation nécessite JavaScript.</p></noscript>
+</body>
+</html>

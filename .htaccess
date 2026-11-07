@@ -1,0 +1,60 @@
+# Site 100 % statique hébergé chez Infomaniak : seuls les fichiers nécessaires à l'affichage sont servis, tout le reste répond 404.
+# Sur un hébergement mutualisé, une directive non autorisée dans .htaccess provoque une erreur 500 : s'en tenir aux directives courantes.
+
+Options -Indexes -MultiViews
+DirectoryIndex index.html
+AddDefaultCharset UTF-8
+
+<IfModule mod_mime.c>
+    # Les modules ES et les workers exigent un type MIME JavaScript strict
+    AddType text/javascript .js .mjs
+    AddCharset UTF-8 .css .js .mjs
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Seules la lecture (GET) et HEAD ont un sens pour un site statique
+    RewriteCond %{REQUEST_METHOD} !^(GET|HEAD)$
+    RewriteRule ^ - [R=405,L]
+
+    # HTTPS forcé ; le TLS peut être terminé par le proxy d'Infomaniak, qui transmet alors X-Forwarded-Proto. Le développement local est exclu.
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Fichiers et dossiers cachés (.git, .claude, .env, .gitignore…), sauf .well-known utilisé par Let's Encrypt
+    RewriteRule (^|/)\.(?!well-known(/|$)) - [R=404,L]
+
+    # Outillage et sources hors production ; ~ bloque aussi les noms courts Windows (NODE_M~1)
+    RewriteRule (^|/)(node_modules|scss|scripts|dist)(/|$) - [NC,R=404,L]
+    RewriteRule ~ - [R=404,L]
+
+    # Liste blanche : tout fichier dont l'extension n'est pas prévue est refusé (md, json, scss, php, sql, env, map, bak…)
+    RewriteCond %{REQUEST_URI} !/\.well-known/
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule !\.(html|css|js|png|jpe?g|webp|avif|gif|svg|ico|woff2?)$ - [NC,R=404,L]
+</IfModule>
+
+# Filet de sécurité si mod_rewrite venait à être désactivé
+<IfModule !mod_rewrite.c>
+    <FilesMatch "^\.|\.(md|json|lock|scss|map|log|env|ini|sql|bak|sh|php|mjs)$">
+        Require all denied
+    </FilesMatch>
+    RedirectMatch 404 (?i)/(\.(?!well-known)|node_modules|scss|scripts|dist)
+</IfModule>
+
+# En-têtes de sécurité ; la Content-Security-Policy principale est dans index.html
+<IfModule mod_headers.c>
+    Header always unset X-Powered-By
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Content-Security-Policy "frame-ancestors 'none'"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Cross-Origin-Resource-Policy "same-origin"
+    # Sans includeSubDomains ni preload : ne pas engager les autres sous-domaines du nom de domaine
+    Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on' || req('X-Forwarded-Proto') == 'https'"
+</IfModule>
